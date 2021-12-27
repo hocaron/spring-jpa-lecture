@@ -62,6 +62,7 @@ public class Order {
         Order order = new Order();
         order.setMember(member);
         order.setDelivery(delivery);
+
         for (OrderItem orderItem : orderItems) {
             order.addOrderItem(orderItem);
         }
@@ -89,8 +90,8 @@ public class Order {
     /**
      * 전체 주문 가격 조회
      */
-    public int getTotalPrice(OrderItem... orderItems) {
-        int totalPrice = Arrays.stream(orderItems).mapToInt(OrderItem::getTotalPrice).sum();
+    public int getTotalPrice() {
+        int totalPrice = orderItems.stream().mapToInt(OrderItem::getTotalPrice).sum();
         return totalPrice;
     }
 }
