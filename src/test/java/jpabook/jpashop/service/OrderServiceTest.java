@@ -1,8 +1,11 @@
 package jpabook.jpashop.service;
 
+import exception.NotEnoughStockException;
 import jpabook.jpashop.domain.*;
 import jpabook.jpashop.domain.item.Book;
+import jpabook.jpashop.domain.item.Item;
 import jpabook.jpashop.repository.OrderRepository;
+import org.aspectj.weaver.ast.Not;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -33,16 +36,9 @@ class OrderServiceTest {
     @Test
     public void 상품주문() throws Exception {
         //given
-        Member member = new Member();
-        member.setName("test1");
-        member.setAddress(new Address("서울", "테스트", "0"));
-        em.persist(member);
+        Member member = createMember();
 
-        Book book = new Book();
-        book.setName("book1");
-        book.setPrice(1000);
-        book.setStockQuantity(100);
-        em.persist(book);
+        Book book = createBook(1000, 100);
 
         int orderCount = 2;
 
@@ -55,24 +51,54 @@ class OrderServiceTest {
         assertThat(OrderStatus.ORDER).isEqualTo(getOrder.getStatus());
         Assertions.assertEquals(1000 * orderCount, getOrder.getTotalPrice());
         assertEquals(98, book.getStockQuantity());
-
     }
 
     @Test
     public void 주문취소() {
         //given
+        Member member = createMember();
+        Book book = createBook(1000, 100);
+
+        int orderCount = 20;
+
+        Long orderId = orderService.order(member.getId(), book.getId(), orderCount);
 
         //when
+        orderService.cancelOrder(orderId);
 
         //then
+        Order getOrder = orderRepository.findOne(orderId);
+        assertEquals(100, book.getStockQuantity());
+        assertEquals(OrderStatus.CANCEL, getOrder.getStatus());
     }
 
     @Test
-    public void 상품주문_재고수량초과() {
+    public void 상품주문_재고수량초과() throws Exception{
         //given
+        Member member = createMember();
+        Item item = createBook(100, 10);
 
         //when
-
+        int orderCount = 11;
         //then
+        NotEnoughStockException notEnoughStockException = assertThrows(NotEnoughStockException.class,
+                () -> orderService.order(member.getId(), item.getId(), orderCount));
+    }
+
+    private Book createBook(int price, int stockQuantity) {
+        Book book = new Book();
+        book.setName("book1");
+        book.setPrice(price);
+        book.setStockQuantity(stockQuantity);
+        em.persist(book);
+        return book;
+    }
+
+    private Member createMember() {
+        Member member = new Member();
+        member.setName("test1");
+        member.setAddress(new Address("서울", "테스트", "0"));
+        em.persist(member);
+        return member;
     }
 }
