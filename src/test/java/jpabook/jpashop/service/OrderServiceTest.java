@@ -1,11 +1,10 @@
 package jpabook.jpashop.service;
 
-import exception.NotEnoughStockException;
+import jpabook.jpashop.exception.NotEnoughStockException;
 import jpabook.jpashop.domain.*;
 import jpabook.jpashop.domain.item.Book;
 import jpabook.jpashop.domain.item.Item;
 import jpabook.jpashop.repository.OrderRepository;
-import org.aspectj.weaver.ast.Not;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
