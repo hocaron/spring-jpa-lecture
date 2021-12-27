@@ -16,7 +16,7 @@ public class OrderItem {
     @Column(name = "order_item_id")
     private Long id;
 
-    @gManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
 
